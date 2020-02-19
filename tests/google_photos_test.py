@@ -39,7 +39,8 @@ class TestGooglePhotos:
         save_dir.mkdir()
         # sqlite dbを削除
         db = Path("./google_photos.db")
-        db.unlink()
+        if db.exists():
+            db.unlink()
 
         media_list = gphotos1.get_media_list(
             page_num=1,
