@@ -1,0 +1,44 @@
+import time
+from mmgphotos.google_photos import GooglePhotos
+from mmgphotos.uploader import upload
+from mmgphotos.upload_option import UploadOption
+from mmgphotos.youtube_add_list import YoutubeAddList
+
+
+def get_album_list():
+    photos = GooglePhotos()
+    album_list = photos.get_album_list(page_num=5)
+    print(album_list)
+
+
+def download_video():
+    photos = GooglePhotos()
+    # media_list = photos.get_media_list(page_num=5)
+
+    # 「YouTubeUploaded」のalbum ID
+    # AMx6VGH3q5mYvV2wQi97KcjHfPizyc19AzmS3efwYlC28HMzDBIQTXqp61g84qLZH7PY-Ue8TYDA
+    media_list = photos.get_media_list(
+        page_num=5,
+        album_id="AMx6VGH3q5mYvV2wQi97KcjHfPizyc19AzmS3efwYlC28HMzDBIQTXqp61g84qLZH7PY-Ue8TYDA",
+        media="VIDEO",
+    )
+    print(media_list)
+
+    download_files = []
+    for media_info in media_list:
+        download_file = photos.download_media(media_info.get("id", "not_found"), save_dir=".")
+        if download_file is not None:
+            download_files.append(download_file)
+
+        # アップロード
+        for download_file in download_files:
+            options = UploadOption(
+                {"file": download_file, "title": "hogehoge", "description": "これは説明です。"}
+            )
+            video_id = upload(options)
+            # playlistに追加 (とりあえずリストは固定)
+            tmp = YoutubeAddList()
+            tmp.add_to_play_list("PLfZruavKtKZy0JdMo7PnbHAEo32twXVZl", video_id)
+
+        # 過負荷を避けるため間隔を開けてAPIを叩く
+        time.sleep(GooglePhotos.sleep_time)
