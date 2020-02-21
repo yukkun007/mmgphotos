@@ -49,9 +49,14 @@ class TestGooglePhotos:
         )
 
         for media_info in media_list:
-            download_file = gphotos1.download_media(
+            description, download_file = gphotos1.download_media(
                 media_info.get("id", "not_found"), save_dir=str(save_dir)
             )
             assert download_file is not None
+            assert description is not None
             path = Path(download_file)
             assert path.exists()
+
+    def test_get_default_description(self, gphotos1):
+        result = gphotos1._get_default_description()
+        print(result)

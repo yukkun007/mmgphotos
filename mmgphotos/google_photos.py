@@ -3,7 +3,7 @@ import logging
 import time
 import sqlite3
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Tuple
 from pathlib import Path
 from requests_oauthlib import OAuth2Session
 
@@ -179,7 +179,7 @@ class GooglePhotos:
             time.sleep(GooglePhotos.sleep_time)
         return media_list
 
-    def download_media(self, media_id: str, save_dir: str = "./") -> Optional[str]:
+    def download_media(self, media_id: str, save_dir: str = "./") -> Tuple[str, Optional[str]]:
         logger.debug("Downloading: {}".format(media_id))
         response = self._get(GooglePhotos.api_url["mediaItem"].format(media_id))
         assert response.status_code == 200
@@ -189,6 +189,7 @@ class GooglePhotos:
         base_url = media_item_latest.get("baseUrl")
         metadata = media_item_latest.get("mediaMetadata")
         filename = media_item_latest.get("filename")
+        description = media_item_latest.get("description", self._get_default_description())
 
         # ダウンロードURLを構成
         if "video" in metadata:
@@ -216,11 +217,15 @@ class GooglePhotos:
             write_path.write_bytes(response.content)
             logger.debug("Saving to {}".format(write_path))
 
-            return "{}".format(write_path)
+            return description, "{}".format(write_path)
         else:
             logger.debug("Download target is already exists. not save.")
 
-            return None
+            return description, None
+
+    def _get_default_description(self):
+        now = datetime.now()
+        return "{0:%Y/%m/%d} 説明がありません".format(now)
 
     def _save_downlod_info(self, id: str, file: str) -> None:
         connector = sqlite3.connect(GooglePhotos.db_file)
