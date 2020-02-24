@@ -1,4 +1,3 @@
-import os
 from setuptools import setup
 
 PACKAGE_NAME = "mmgphotos"

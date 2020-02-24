@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import time
@@ -30,9 +31,7 @@ class GooglePhotos:
     db_table = "downloaded_media"
 
     def __init__(
-        self,
-        token_path="mmgphotos_token.json",
-        credential_path="mmgphotos_client_secret.json"
+        self, token_path="mmgphotos_token.json", credential_path="mmgphotos_client_secret.json"
     ):
         self._token_path = token_path
         self._google_session, logged_in = self._login(credential_path)
@@ -62,7 +61,11 @@ class GooglePhotos:
             "expires_at": (datetime.now() - timedelta(hours=2)).timestamp(),
         }
         path = Path(self._token_path)
-        if path.exists():
+
+        if "mmgphotos_token_contents" in os.environ:
+            # .envから読み込む
+            token = json.loads(os.environ["mmgphotos_token_contents"])
+        elif path.exists():
             logger.debug("トークンをファイルから読み込んでいます")
             token = json.loads(path.read_text())
         return token
@@ -86,8 +89,15 @@ class GooglePhotos:
         self._check_and_refresh_token()
         return self._google_session.post(*args, **kwargs)
 
+    def _save_credential_from_env(self, credential_path):
+        logger.debug("認証情報を保存しています")
+        credential = os.environ.get("mmgphotos_client_secret_contents", "dummy")
+        Path(credential_path).write_text(credential)
+
     # ログインしてセッションオブジェクトを返す
     def _login(self, credential_path):
+        # 認証情報を環境変数から書き込み
+        self._save_credential_from_env(credential_path)
         # 認証情報を読み込み
         auth_info = json.loads(Path(credential_path).read_text()).get("installed", None)
         assert auth_info is not None
