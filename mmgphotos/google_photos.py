@@ -28,7 +28,7 @@ class GooglePhotos:
     # sleep_time = 10
     photo_download_format = "{base}=w{width}-h{height}"
     video_download_format = "{base}=dv"
-    db_file = "google_photos.db"
+    db_file = "/tmp/mmgphotos.db"
     db_table = "downloaded_media"
 
     def __init__(

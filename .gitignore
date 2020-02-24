@@ -121,4 +121,4 @@ mmgphotos_client_secret.json
 mmgphotos_token.json
 
 # db
-google_photos.db
+mmgphotos.db
