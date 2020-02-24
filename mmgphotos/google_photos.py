@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Tuple
 from pathlib import Path
 from requests_oauthlib import OAuth2Session
+from dotenv import load_dotenv
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -31,8 +32,12 @@ class GooglePhotos:
     db_table = "downloaded_media"
 
     def __init__(
-        self, token_path="mmgphotos_token.json", credential_path="mmgphotos_client_secret.json"
+        self,
+        token_path="/tmp/mmgphotos_token.json",
+        credential_path="/tmp/mmgphotos_client_secret.json",
     ):
+        load_dotenv(verbose=True)
+
         self._token_path = token_path
         self._google_session, logged_in = self._login(credential_path)
         # ログイン処理が行われていたらトークンを保存
