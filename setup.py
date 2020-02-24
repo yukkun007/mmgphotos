@@ -6,7 +6,7 @@ PACKAGE_NAME = "mmgphotos"
 with open("README.md") as f:
     readme = f.read()
 
-with open(os.path.join(PACKAGE_NAME, "VERSION")) as f:
+with open("VERSION") as f:
     version = f.read()
 
 setup(
