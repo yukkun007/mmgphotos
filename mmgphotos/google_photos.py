@@ -35,8 +35,9 @@ class GooglePhotos:
         self,
         token_path="/tmp/mmgphotos_token.json",
         credential_path="/tmp/mmgphotos_client_secret.json",
+        dotenv_path: str = None,
     ):
-        load_dotenv(verbose=True)
+        load_dotenv(dotenv_path=dotenv_path, verbose=True)
 
         self._token_path = token_path
         self._google_session, logged_in = self._login(credential_path)
