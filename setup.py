@@ -24,7 +24,13 @@ setup(
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.6",
-    install_requires=["google-api-python-client", "google-auth-oauthlib", "oauth2client"],
+    install_requires=[
+        "google-api-python-client",
+        "google-auth-oauthlib",
+        "oauth2client",
+        "python-dotenv",
+        "boto3",
+    ],
     entry_points="""
         [console_scripts]
         {app} = {app}.cli:main
