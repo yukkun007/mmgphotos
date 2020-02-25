@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 from pathlib import Path
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
+from mmgphotos.s3_accesser import S3Accesser
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -252,8 +253,26 @@ class GooglePhotos:
         connector.commit()
         connector.close()
 
+        self._update_remote_db_file()
+
+    def _update_remote_db_file(self):
+        # 環境変数指定がある時のみ、S3からダウンロードします
+        s3_path = os.environ.get("mmgphotos_db_file_s3_key_name", None)
+        if s3_path is not None:
+            accesser = S3Accesser("magarimame")
+            accesser.upload(GooglePhotos.db_file, s3_path)
+
+    def _update_local_db_file(self):
+        # 環境変数指定がある時のみ、S3からダウンロードします
+        s3_path = os.environ.get("mmgphotos_db_file_s3_key_name", None)
+        if s3_path is not None:
+            accesser = S3Accesser("magarimame")
+            accesser.download(s3_path, GooglePhotos.db_file)
+
     def _is_already_downloaded(self, search_id: str) -> bool:
         hit = False
+
+        self._update_local_db_file()
 
         connector = sqlite3.connect(GooglePhotos.db_file)
         sql = "create table if not exists {}(id text, file text)".format(GooglePhotos.db_table)

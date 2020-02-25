@@ -1,3 +1,4 @@
+import os
 import pytest
 import shutil
 from pathlib import Path
@@ -38,7 +39,7 @@ class TestGooglePhotos:
             shutil.rmtree(save_dir)
         save_dir.mkdir()
         # sqlite dbを削除
-        db = Path("./google_photos.db")
+        db = Path("/tmp/mmgphotos.db")
         if db.exists():
             db.unlink()
 
@@ -57,6 +58,17 @@ class TestGooglePhotos:
             path = Path(download_file)
             assert path.exists()
 
-    def test_get_default_description(self, gphotos1):
+            # 取り敢えず1個テストすれば良い
+            break
+
+    def default_description(self, gphotos1):
         result = gphotos1._get_default_description()
         print(result)
+
+    def test_update_remote_db_file(self, gphotos1: GooglePhotos):
+        os.environ["mmgphotos_db_file_s3_key_name"] = "mmgphotos/mmgphotos.db"
+        gphotos1._update_remote_db_file()
+
+    def test_update_local_db_file(self, gphotos1: GooglePhotos):
+        os.environ["mmgphotos_db_file_s3_key_name"] = "mmgphotos/mmgphotos.db"
+        gphotos1._update_local_db_file()
